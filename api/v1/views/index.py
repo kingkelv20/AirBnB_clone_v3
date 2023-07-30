@@ -1,15 +1,29 @@
 #!/usr/bin/python3
-"""create a route status"""
-from flask import Blueprint, jsonify
+"""
+This module contains endpoint(route) status
+"""
+from models import storage
+from flask import Flask
+from api.v1.views import app_views
+from flask import jsonify
 
-# Create a variable app_views which is an instance of Blueprint
-app_views = Blueprint('app_views', __name__, url_prefix='/api/v1')
 
-# Create the route /status on the app_views Blueprint
-@app_views.route('/status', methods=['GET'])
-def get_status():
-    status_data = {"status": "OK"}
-    return jsonify(status_data)
+@app_views.route('/status', strict_slashes=False)
+def status():
+    """
+    Returns a JSON status
+    """
+    return jsonify({"status": "OK"})
 
-# Wildcard import of everything in the package api.v1.views.index
-from api.v1.views.index import *
+
+@app_views.route('/stats', strict_slashes=False)
+def count():
+    """
+    Retrieves the number of each objects by type
+    """
+    return jsonify({"amenities": storage.count("Amenity"),
+                    "cities": storage.count("City"),
+                    "places": storage.count("Place"),
+                    "reviews": storage.count("Review"),
+                    "states": storage.count("State"),
+                    "users": storage.count("User")})
